@@ -39,4 +39,22 @@ public class Transaction {
     
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    public Transaction() {}
+
+
+    public Transaction(Long id, String description, BigDecimal amount,
+                       TransactionType type, Category category,
+                       LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.id = id;
+        this.description = description;
+        this.amount = amount;
+        this.type = type;
+        this.category = category;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
+
+
+}
 }
