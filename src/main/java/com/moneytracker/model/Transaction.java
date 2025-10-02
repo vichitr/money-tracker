@@ -57,6 +57,15 @@ public class Transaction {
         this.updatedAt = updatedAt;
     }
 
+    public Transaction(String description, BigDecimal amount, TransactionType type, Category category) {
+        this.description = description;
+        this.amount = amount;
+        this.type = type;
+        this.category = category;
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
 
     public Long getId() {
         return id;
