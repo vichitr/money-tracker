@@ -14,24 +14,26 @@ public class Transaction {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
+
     
     @NotBlank(message = "Description is required")
-    @Column(nullable = false)
+    @Column(nullable = false, name = "description")
     private String description;
     
     @NotNull(message = "Amount is required")
     @DecimalMin(value = "0.01", message = "Amount must be greater than 0")
     @DecimalMax(value = "10000000", message = "Amount must be lesser than 1 Cr")
-    @Column(nullable = false, precision = 10, scale = 2)
+    @Column(nullable = false, precision = 10, scale = 2, name = "amount")
     private BigDecimal amount;
     
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, name = "transaction_type")
     private TransactionType type;
     
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false , name = "category")
     private Category category;
     
     @Column(name = "created_at")
@@ -111,9 +113,4 @@ public class Transaction {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
-
-
-
-
-
 }
