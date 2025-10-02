@@ -15,64 +15,6 @@ import java.math.BigDecimal;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-public class Transaction {
-    private Long id;
-    private String description;
-    private BigDecimal amount;
-    private TransactionType type;
-    private Category category;
-
-
-    public Transaction(Long id, String description, BigDecimal amount,
-                       TransactionType type, Category category) {
-        this.id = id;
-        this.description = description;
-        this.amount = amount;
-        this.type = type;
-        this.category = category;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
-    }
-
-    public TransactionType getType() {
-        return type;
-    }
-
-    public void setType(TransactionType type) {
-        this.type = type;
-    }
-
-    public Category getCategory() {
-        return category;
-    }
-
-    public void setCategory(Category category) {
-        this.category = category;
-    }
-
-}
 @WebMvcTest(TransactionController.class)
 class TransactionControllerTest {
 
@@ -81,7 +23,6 @@ class TransactionControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
-
 
     @Test
     void getAllTransactions_ShouldReturnOk() throws Exception {
