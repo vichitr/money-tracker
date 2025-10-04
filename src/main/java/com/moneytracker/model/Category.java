@@ -16,7 +16,7 @@ public enum Category {
     ENTERTAINMENT("Entertainment"),
     SHOPPING("Shopping"),
     BILLS("Bills & Utilities"),
-    EDUCATION("fees & stationary"),
+    EDUCATION("Education"),
     GROCERY("Grocery"),
     GIFT("Gifs"),
     HOUSEHOLD("Household"),
