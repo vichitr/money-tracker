@@ -4,6 +4,8 @@ public enum Category {
     // Income Categories
     SALARY("Salary"),
     FREELANCE("Freelance"),
+    RENTAL_INCOME("Rental Income"),
+    TAX_REFUND("Tax Refund"),
     INVESTMENT("Investment"),
     BUSINESS("Business"),
     OTHER_INCOME("Other Income"),
@@ -14,8 +16,14 @@ public enum Category {
     ENTERTAINMENT("Entertainment"),
     SHOPPING("Shopping"),
     BILLS("Bills & Utilities"),
-    HEALTHCARE("Healthcare"),
     EDUCATION("Education"),
+    GROCERY("Grocery"),
+    GIFT("Gifs"),
+    HOUSEHOLD("Household"),
+    INSURANCE("Insurance"),
+    ELECTRONICS("Electronics"),
+    HEALTHCARE("Healthcare"),
+
     TRAVEL("Travel"),
     RENT("Rent & Housing"),
     OTHER_EXPENSE("Other Expense");
