@@ -163,7 +163,7 @@ class TransactionControllerTest {
 
     @Test
     void getTransactionsByCategory_WithNonExistentCategory_ShouldReturnEmptyArray() throws Exception {
-        mockMvc.perform(get("/api/transactions/by-category/FOOD"))
+        mockMvc.perform(get("/api/transactions/by-category/BILLS"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$").isArray())
