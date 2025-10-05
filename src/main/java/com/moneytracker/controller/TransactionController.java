@@ -3,6 +3,8 @@ package com.moneytracker.controller;
 import com.moneytracker.model.Transaction;
 import com.moneytracker.model.TransactionType;
 import com.moneytracker.model.Category;
+import com.moneytracker.service.TransactionService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +25,9 @@ public class TransactionController {
     // In-memory storage for demo purposes
     private final List<Transaction> transactions = new ArrayList<>();
     private final AtomicLong counter = new AtomicLong();
+
+    @Autowired
+    private TransactionService transactionService;
     
     // Initialize with some dummy data
     public TransactionController() {
@@ -31,7 +36,7 @@ public class TransactionController {
     
     @GetMapping
     public ResponseEntity<List<Transaction>> getAllTransactions() {
-        return ResponseEntity.ok(transactions);
+        return ResponseEntity.ok(transactionService.getAllTransactions());
     }
     
     @GetMapping("/{id}")
