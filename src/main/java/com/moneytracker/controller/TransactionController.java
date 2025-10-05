@@ -51,7 +51,7 @@ public class TransactionController {
         transaction.setUpdatedAt(LocalDateTime.now());
         
         transactions.add(transaction);
-        return ResponseEntity.status(HttpStatus.OK).body(transaction);
+        return ResponseEntity.status(HttpStatus.CREATED).body(transaction);
     }
     
     @PutMapping("/{id}")
