@@ -1,5 +1,6 @@
 package com.moneytracker.service;
 
+import com.moneytracker.controller.TransactionController;
 import com.moneytracker.model.Category;
 import com.moneytracker.model.Transaction;
 import com.moneytracker.model.TransactionType;
@@ -7,8 +8,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Service
@@ -24,6 +27,79 @@ public class TransactionService {
     public List<Transaction> getAllTransactions() {
         return transactions;
     }
+
+    public Optional<Transaction> getTransactionById(Long id) {
+        Optional<Transaction> transaction = transactions.stream()
+                .filter(t -> t.getId().equals(id))
+                .findFirst();
+        return transaction;
+    }
+
+    public  Transaction createTransaction(Transaction transaction){
+        transaction.setId(counter.incrementAndGet());
+        transaction.setCreatedAt(LocalDateTime.now());
+        transaction.setUpdatedAt(LocalDateTime.now());
+
+        transactions.add(transaction);
+        return transaction;
+    }
+
+    public Optional<Transaction> updateTransaction(Long  id, Transaction updatedTransaction ) {
+        Optional<Transaction> existingTransaction = transactions.stream()
+                .filter(t -> t.getId().equals(id))
+                .findFirst();
+
+        if (existingTransaction.isPresent()) {
+            Transaction transaction = existingTransaction.get();
+            transaction.setDescription(updatedTransaction.getDescription());
+            transaction.setAmount(updatedTransaction.getAmount());
+            transaction.setType(updatedTransaction.getType());
+            transaction.setCategory(updatedTransaction.getCategory());
+            transaction.setUpdatedAt(LocalDateTime.now());
+
+            return Optional.of(updatedTransaction);
+        }
+        return Optional.empty();
+    }
+
+    public boolean deleteTransaction(Long id) {
+        boolean removed = transactions.removeIf(t -> t.getId().equals(id));
+        return removed;
+    }
+
+    public TransactionController.TransactionSummary getTransactionSummary(){
+        BigDecimal totalIncome = transactions.stream()
+                .filter(t -> t.getType() == TransactionType.INCOME)
+                .map(Transaction::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal totalExpense = transactions.stream()
+                .filter(t -> t.getType() == TransactionType.EXPENSE)
+                .map(Transaction::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal balance = totalIncome.subtract(totalExpense);
+
+        TransactionController.TransactionSummary summary = new TransactionController.TransactionSummary(totalIncome, totalExpense, balance, transactions.size());
+
+        return summary;
+    }
+
+    public List<Transaction> getTransactionsByType(TransactionType type){
+        List<Transaction> filteredTransactions = transactions.stream()
+                .filter(t -> t.getType() == type)
+                .toList();
+        return filteredTransactions;
+    }
+
+    public List<Transaction> getTransactionsByCategory(Category category){
+        List<Transaction> filteredTransactions = transactions.stream()
+                .filter(t -> t.getCategory() == category)
+                .toList();
+        return filteredTransactions;
+    }
+
+
 
     private void initializeDummyData() {
         // Add some sample transactions

@@ -40,7 +40,7 @@ public class TransactionController {
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<Transaction> getTransactionById(@PathVariable Long id) {
+    public ResponseEntity<Transaction> getTransactionsById(@PathVariable long id) {
         Optional<Transaction> transaction = transactions.stream()
                 .filter(t -> t.getId().equals(id))
                 .findFirst();
