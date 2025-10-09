@@ -28,7 +28,7 @@ public class TransactionService {
         return transactions;
     }
 
-    public Optional<Transaction> getTransactionById(Long id) {
+    public Optional<Transaction> getTransactionById(long id) {
         Optional<Transaction> transaction = transactions.stream()
                 .filter(t -> t.getId().equals(id))
                 .findFirst();
