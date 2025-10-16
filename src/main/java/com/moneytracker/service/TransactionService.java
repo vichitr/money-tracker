@@ -27,10 +27,9 @@ public class TransactionService {
   }
 
   public Optional<Transaction> getTransactionById(long id) {
-    Optional<Transaction> transaction = transactions.stream()
+    return transactions.stream()
         .filter(t -> t.getId().equals(id))
         .findFirst();
-    return transaction;
   }
 
   public Transaction createTransaction(Transaction transaction) {
@@ -61,8 +60,7 @@ public class TransactionService {
   }
 
   public boolean deleteTransaction(Long id) {
-    boolean removed = transactions.removeIf(t -> t.getId().equals(id));
-    return removed;
+    return transactions.removeIf(t -> t.getId().equals(id));
   }
 
   public TransactionSummary getTransactionSummary() {
@@ -82,17 +80,15 @@ public class TransactionService {
   }
 
   public List<Transaction> getTransactionsByType(TransactionType type) {
-    List<Transaction> filteredTransactions = transactions.stream()
+    return transactions.stream()
         .filter(t -> t.getType() == type)
         .toList();
-    return filteredTransactions;
   }
 
   public List<Transaction> getTransactionsByCategory(Category category) {
-    List<Transaction> filteredTransactions = transactions.stream()
+    return transactions.stream()
         .filter(t -> t.getCategory() == category)
         .toList();
-    return filteredTransactions;
   }
 
   private void initializeDummyData() {
