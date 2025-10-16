@@ -26,8 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin(origins = "*")
 public class TransactionController {
 
-  @Autowired
-  private TransactionService transactionService;
+  @Autowired private TransactionService transactionService;
 
   @GetMapping
   public ResponseEntity<List<Transaction>> getAllTransactions() {
