@@ -61,13 +61,35 @@ A simple Spring Boot backend application for tracking personal finances.
 
 ## Running the Application
 
-1. Make sure you have Java 17+ installed
-2. Run the application:
+### Option 1: Using Docker (Recommended)
+
+1. Make sure you have Docker and Docker Compose installed
+2. Run the application with MySQL:
+   ```bash
+   docker-compose up -d
+   ```
+3. The application will start on `http://localhost:8080`
+4. Check health status at `http://localhost:8080/actuator/health`
+
+For detailed Docker instructions, see [DOCKER.md](DOCKER.md)
+
+### Option 2: Running Locally
+
+1. Make sure you have Java 17+ and MySQL installed
+2. Create a MySQL database named `money_tracker`
+3. Configure database connection in `application.properties` or use environment variables:
+   ```bash
+   export DB_HOST=localhost
+   export DB_PORT=3306
+   export DB_NAME=money_tracker
+   export DB_USERNAME=your_username
+   export DB_PASSWORD=your_password
+   ```
+4. Run the application:
    ```bash
    mvn spring-boot:run
    ```
-3. The application will start on `http://localhost:8080`
-4. Access H2 database console at `http://localhost:8080/h2-console`
+5. The application will start on `http://localhost:8080`
 
 ## Sample API Calls
 
@@ -98,6 +120,12 @@ curl http://localhost:8080/api/transactions/summary
 - Spring Boot 3.2.0
 - Spring Web
 - Spring Data JPA
-- H2 Database (in-memory)
+- MySQL 8.0
+- Spring Boot Actuator
+- Docker & Docker Compose
 - Maven
 - Java 17
+
+## Database
+
+The application uses MySQL for persistent data storage. When running with Docker, MySQL is automatically configured and initialized. For local development, you'll need to set up MySQL manually.

@@ -4,47 +4,39 @@ import com.moneytracker.model.Category;
 import com.moneytracker.model.Transaction;
 import com.moneytracker.model.TransactionSummary;
 import com.moneytracker.model.TransactionType;
+import com.moneytracker.repository.TransactionRepository;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicLong;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 public class TransactionService {
 
-  private final List<Transaction> transactions = new ArrayList<>();
-  private final AtomicLong counter = new AtomicLong();
+  private final TransactionRepository transactionRepository;
 
-  public TransactionService() {
-    initializeDummyData();
+  public TransactionService(TransactionRepository transactionRepository) {
+    this.transactionRepository = transactionRepository;
   }
 
+  @Transactional(readOnly = true)
   public List<Transaction> getAllTransactions() {
-    return transactions;
+    return transactionRepository.findAll();
   }
 
+  @Transactional(readOnly = true)
   public Optional<Transaction> getTransactionById(long id) {
-    return transactions.stream()
-        .filter(t -> t.getId().equals(id))
-        .findFirst();
+    return transactionRepository.findById(id);
   }
 
   public Transaction createTransaction(Transaction transaction) {
-    transaction.setId(counter.incrementAndGet());
-    transaction.setCreatedAt(LocalDateTime.now());
-    transaction.setUpdatedAt(LocalDateTime.now());
-
-    transactions.add(transaction);
-    return transaction;
+    return transactionRepository.save(transaction);
   }
 
   public Optional<Transaction> updateTransaction(Long id, Transaction updatedTransaction) {
-    Optional<Transaction> existingTransaction = transactions.stream()
-        .filter(t -> t.getId().equals(id))
-        .findFirst();
+    Optional<Transaction> existingTransaction = transactionRepository.findById(id);
 
     if (existingTransaction.isPresent()) {
       Transaction transaction = existingTransaction.get();
@@ -52,18 +44,24 @@ public class TransactionService {
       transaction.setAmount(updatedTransaction.getAmount());
       transaction.setType(updatedTransaction.getType());
       transaction.setCategory(updatedTransaction.getCategory());
-      transaction.setUpdatedAt(LocalDateTime.now());
 
-      return Optional.of(transaction);
+      return Optional.of(transactionRepository.save(transaction));
     }
     return Optional.empty();
   }
 
   public boolean deleteTransaction(Long id) {
-    return transactions.removeIf(t -> t.getId().equals(id));
+    if (transactionRepository.existsById(id)) {
+      transactionRepository.deleteById(id);
+      return true;
+    }
+    return false;
   }
 
+  @Transactional(readOnly = true)
   public TransactionSummary getTransactionSummary() {
+    List<Transaction> transactions = transactionRepository.findAll();
+    
     BigDecimal totalIncome = transactions.stream()
         .filter(t -> t.getType() == TransactionType.INCOME)
         .map(Transaction::getAmount)
@@ -79,38 +77,13 @@ public class TransactionService {
     return new TransactionSummary(totalIncome, totalExpense, balance, transactions.size());
   }
 
+  @Transactional(readOnly = true)
   public List<Transaction> getTransactionsByType(TransactionType type) {
-    return transactions.stream()
-        .filter(t -> t.getType() == type)
-        .toList();
+    return transactionRepository.findByType(type);
   }
 
+  @Transactional(readOnly = true)
   public List<Transaction> getTransactionsByCategory(Category category) {
-    return transactions.stream()
-        .filter(t -> t.getCategory() == category)
-        .toList();
-  }
-
-  private void initializeDummyData() {
-    // Add some sample transactions
-    Transaction transaction1 = new Transaction("Salary", new BigDecimal("5000.00"),
-        TransactionType.INCOME, Category.SALARY);
-    transaction1.setId(counter.incrementAndGet());
-    transactions.add(transaction1);
-
-    Transaction transaction2 = new Transaction("Grocery Shopping", new BigDecimal("150.50"),
-        TransactionType.EXPENSE, Category.FOOD);
-    transaction2.setId(counter.incrementAndGet());
-    transactions.add(transaction2);
-
-    Transaction transaction3 = new Transaction("Gas Bill", new BigDecimal("75.00"),
-        TransactionType.EXPENSE, Category.BILLS);
-    transaction3.setId(counter.incrementAndGet());
-    transactions.add(transaction3);
-
-    Transaction transaction4 = new Transaction("Freelance Project", new BigDecimal("800.00"),
-        TransactionType.INCOME, Category.FREELANCE);
-    transaction4.setId(counter.incrementAndGet());
-    transactions.add(transaction4);
+    return transactionRepository.findByCategory(category);
   }
 }
