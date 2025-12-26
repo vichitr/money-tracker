@@ -129,3 +129,11 @@ curl http://localhost:8080/api/transactions/summary
 ## Database
 
 The application uses MySQL for persistent data storage. When running with Docker, MySQL is automatically configured and initialized. For local development, you'll need to set up MySQL manually.
+
+## Restart Docker
+```
+docker stop $(docker ps -q)
+docker rm $(docker ps -q) 
+docker system prune
+docker system prune --volumes
+```
