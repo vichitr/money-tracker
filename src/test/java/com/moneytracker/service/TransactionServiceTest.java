@@ -6,11 +6,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.moneytracker.model.AccountType;
 import com.moneytracker.model.Category;
 import com.moneytracker.model.Transaction;
 import com.moneytracker.model.TransactionType;
 import com.moneytracker.repository.TransactionRepository;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -32,8 +34,8 @@ class TransactionServiceTest {
   @Test
   void getAllTransactions() {
     // Arrange
-    Transaction t1 = new Transaction("T1", BigDecimal.TEN, TransactionType.INCOME, Category.SALARY);
-    Transaction t2 = new Transaction("T2", BigDecimal.ONE, TransactionType.EXPENSE, Category.FOOD);
+    Transaction t1 = new Transaction("T1", BigDecimal.TEN, TransactionType.INCOME, Category.SALARY,AccountType.CASH, LocalDate.of(2025,12,11));
+    Transaction t2 = new Transaction("T2", BigDecimal.ONE, TransactionType.EXPENSE, Category.FOOD,AccountType.CREDIT_CARD, LocalDate.of(2025,12,26));
     when(transactionRepository.findAll()).thenReturn(Arrays.asList(t1, t2));
 
     // Act
@@ -48,7 +50,7 @@ class TransactionServiceTest {
   void getTransactionById() {
     // Arrange
     Long id = 1L;
-    Transaction t1 = new Transaction("T1", BigDecimal.TEN, TransactionType.INCOME, Category.SALARY);
+    Transaction t1 = new Transaction("T1", BigDecimal.TEN, TransactionType.INCOME, Category.SALARY, AccountType.WALLET,LocalDate.of(2025,9,25));
     t1.setId(id);
     when(transactionRepository.findById(id)).thenReturn(Optional.of(t1));
 
@@ -64,7 +66,7 @@ class TransactionServiceTest {
   @Test
   void createTransaction() {
     // Arrange
-    Transaction t1 = new Transaction("T1", BigDecimal.TEN, TransactionType.INCOME, Category.SALARY);
+    Transaction t1 = new Transaction("T1", BigDecimal.TEN, TransactionType.INCOME, Category.SALARY, AccountType.BANK_TRANSFER, LocalDate.of(2024,9,14));
     when(transactionRepository.save(any(Transaction.class))).thenReturn(t1);
 
     // Act
