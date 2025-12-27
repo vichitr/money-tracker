@@ -9,11 +9,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.moneytracker.model.AccountType;
 import com.moneytracker.model.Category;
 import com.moneytracker.model.Transaction;
 import com.moneytracker.model.TransactionType;
 import com.moneytracker.repository.TransactionRepository;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,10 +43,11 @@ class TransactionControllerTest {
   void setUp() {
     transactionRepository.deleteAll();
     
-    Transaction t1 = new Transaction("Salary", new BigDecimal("5000.00"), TransactionType.INCOME, Category.SALARY);
-    Transaction t2 = new Transaction("Grocery", new BigDecimal("150.50"), TransactionType.EXPENSE, Category.FOOD);
-    Transaction t3 = new Transaction("Gas", new BigDecimal("75.00"), TransactionType.EXPENSE, Category.BILLS);
-    Transaction t4 = new Transaction("Freelance", new BigDecimal("800.00"), TransactionType.INCOME, Category.FREELANCE);
+    Transaction t1 = new Transaction("Salary", new BigDecimal("5000.00"), TransactionType.INCOME, Category.SALARY,
+        AccountType.CASH, LocalDate.EPOCH);
+    Transaction t2 = new Transaction("Grocery", new BigDecimal("150.50"), TransactionType.EXPENSE, Category.FOOD, AccountType.BANK_TRANSFER, LocalDate.EPOCH);
+    Transaction t3 = new Transaction("Gas", new BigDecimal("75.00"), TransactionType.EXPENSE, Category.BILLS, AccountType.WALLET, LocalDate.MIN);
+    Transaction t4 = new Transaction("Freelance", new BigDecimal("800.00"), TransactionType.INCOME, Category.FREELANCE, AccountType.REWARD_POINTS, LocalDate.EPOCH);
     
     transactionRepository.save(t1);
     transactionRepository.save(t2);
@@ -80,7 +83,7 @@ class TransactionControllerTest {
 
   @Test
   void createTransaction_WithValidData_ShouldReturnCreated() throws Exception {
-    Transaction newTransaction = new Transaction("Test Transaction", new BigDecimal("100.00"), TransactionType.EXPENSE, Category.FOOD);
+    Transaction newTransaction = new Transaction("Test Transaction", new BigDecimal("100.00"), TransactionType.EXPENSE, Category.FOOD,AccountType.CREDIT_CARD, LocalDate.EPOCH);
 
     mockMvc.perform(post("/api/transactions")
             .contentType(MediaType.APPLICATION_JSON)
@@ -104,7 +107,7 @@ class TransactionControllerTest {
   void updateTransaction_WithValidData_ShouldReturnOk() throws Exception {
     Long id = transactionRepository.findAll().get(0).getId();
     
-    Transaction updatedTransaction = new Transaction("Updated Salary", new BigDecimal("6000.00"), TransactionType.INCOME, Category.SALARY);
+    Transaction updatedTransaction = new Transaction("Updated Salary", new BigDecimal("6000.00"), TransactionType.INCOME, Category.SALARY,AccountType.BANK_TRANSFER, LocalDate.EPOCH);
 
     mockMvc.perform(put("/api/transactions/" + id)
             .contentType(MediaType.APPLICATION_JSON)
@@ -116,7 +119,8 @@ class TransactionControllerTest {
 
   @Test
   void updateTransaction_WithInvalidId_ShouldReturnNotFound() throws Exception {
-    Transaction updatedTransaction = new Transaction("Updated", new BigDecimal("100.00"), TransactionType.EXPENSE, Category.FOOD);
+    Transaction updatedTransaction = new Transaction("Updated", new BigDecimal("100.00"), TransactionType.EXPENSE, Category.FOOD, AccountType.CASH
+    , LocalDate.EPOCH);
 
     mockMvc.perform(put("/api/transactions/99999")
             .contentType(MediaType.APPLICATION_JSON)

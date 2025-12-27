@@ -6,6 +6,7 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -35,6 +36,15 @@ public class Transaction {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false , name = "category")
     private Category category;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, name = "account_type")
+    @NotNull(message = "Account type is required")
+    private AccountType accountType;
+
+    @Column(name = "date", nullable = false)
+    @NotNull(message = "date cannot be empty")
+    private LocalDate date;
     
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
@@ -57,22 +67,27 @@ public class Transaction {
 
 
     public Transaction(Long id, String description, BigDecimal amount,
-                       TransactionType type, Category category,
+                       TransactionType type, Category category,AccountType accountType,LocalDate date,
                        LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.description = description;
         this.amount = amount;
         this.type = type;
         this.category = category;
+        this.accountType = accountType;
+        this.date = date;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+
     }
 
-    public Transaction(String description, BigDecimal amount, TransactionType type, Category category) {
+    public Transaction(String description, BigDecimal amount, TransactionType type, Category category, AccountType accountType, LocalDate date) {
         this.description = description;
         this.amount = amount;
         this.type = type;
         this.category = category;
+        this.accountType = accountType;
+        this.date = date;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
@@ -116,6 +131,21 @@ public class Transaction {
 
     public void setCategory(Category category) {
         this.category = category;
+    }
+
+    public AccountType getAccountType() {
+        return accountType;
+    }
+    public void setAccountType(AccountType accountType){
+        this.accountType = accountType;
+    }
+
+    public LocalDate getDate(){
+        return date;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
     }
 
     public LocalDateTime getCreatedAt() {

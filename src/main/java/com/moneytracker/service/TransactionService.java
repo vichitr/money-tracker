@@ -6,6 +6,7 @@ import com.moneytracker.model.TransactionSummary;
 import com.moneytracker.model.TransactionType;
 import com.moneytracker.repository.TransactionRepository;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
@@ -32,9 +33,29 @@ public class TransactionService {
   }
 
   public Transaction createTransaction(Transaction transaction) {
+    // validate user inputs
+    if (transaction.getDescription().isBlank()) {
+      throw new RuntimeException("Trxn description cant be blank");
+    }
+    if (transaction.getAmount().compareTo(BigDecimal.ZERO) <= 0
+        || transaction.getAmount().compareTo(new BigDecimal("10000000")) > 0) {
+      throw new IllegalArgumentException("can't be less than zero and greater than 1Cr");
+    }
+    if (transaction.getType() == null) {
+      throw new RuntimeException("Trxn Type can't be null");
+    }
+    if(transaction.getCategory() == null) {
+      throw new RuntimeException("Category can't be empty");
+    }
+    if(transaction.getAccountType() == null){
+      throw new RuntimeException("provide account type");
+    }
+    if(transaction.getDate() == null || transaction.getDate().isAfter(LocalDate.now())){
+      throw new RuntimeException("Date can't be empty or in future");
+    }
+
     return transactionRepository.save(transaction);
   }
-
   public Optional<Transaction> updateTransaction(Long id, Transaction updatedTransaction) {
     Optional<Transaction> existingTransaction = transactionRepository.findById(id);
 

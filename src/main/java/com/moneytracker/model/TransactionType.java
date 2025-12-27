@@ -5,7 +5,7 @@ public enum TransactionType {
     EXPENSE("Expense");
     
     private final String displayName;
-    
+
     TransactionType(String displayName) {
         this.displayName = displayName;
     }
