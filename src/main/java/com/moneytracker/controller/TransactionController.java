@@ -54,11 +54,9 @@ public class TransactionController {
     Optional<Transaction> existingTransaction = transactionService.updateTransaction(id,
         updatedTransaction);
 
-    if (existingTransaction.isPresent()) {
-      return ResponseEntity.ok(existingTransaction.get());
-    }
+    return existingTransaction.map(ResponseEntity::ok)
+        .orElseGet(() -> ResponseEntity.notFound().build());
 
-    return ResponseEntity.notFound().build();
   }
 
   @DeleteMapping("/{id}")
