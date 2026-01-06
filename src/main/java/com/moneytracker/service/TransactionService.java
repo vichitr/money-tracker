@@ -1,6 +1,8 @@
 package com.moneytracker.service;
 
 import com.moneytracker.model.Category;
+import com.moneytracker.model.ListTransactionRequest;
+import com.moneytracker.model.ListTransactionResponse;
 import com.moneytracker.model.Transaction;
 import com.moneytracker.model.TransactionSummary;
 import com.moneytracker.model.TransactionType;
@@ -26,6 +28,11 @@ public class TransactionService {
   public List<Transaction> getAllTransactions() {
     return transactionRepository.findAll();
   }
+
+  public ListTransactionResponse listTransactions(ListTransactionRequest request) {
+    return new ListTransactionResponse(transactionRepository.findAll());
+  }
+
 
   @Transactional(readOnly = true)
   public Optional<Transaction> getTransactionById(long id) {
