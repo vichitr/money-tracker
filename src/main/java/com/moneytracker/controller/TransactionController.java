@@ -1,6 +1,8 @@
 package com.moneytracker.controller;
 
 import com.moneytracker.model.Category;
+import com.moneytracker.model.ListTransactionRequest;
+import com.moneytracker.model.ListTransactionResponse;
 import com.moneytracker.model.Transaction;
 import com.moneytracker.model.TransactionSummary;
 import com.moneytracker.model.TransactionType;
@@ -31,6 +33,13 @@ public class TransactionController {
   @GetMapping
   public ResponseEntity<List<Transaction>> getAllTransactions() {
     return ResponseEntity.ok(transactionService.getAllTransactions());
+  }
+
+  @PostMapping("/list")
+  public ResponseEntity<ListTransactionResponse> listTransactions (
+      @RequestBody ListTransactionRequest request) {
+    ListTransactionResponse response = transactionService.listTransactions(request);
+    return ResponseEntity.ok(response);
   }
 
   @GetMapping("/{id}")
