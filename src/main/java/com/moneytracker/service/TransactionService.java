@@ -81,11 +81,11 @@ public class TransactionService {
     if (transaction.getAccountType() == null) {
       throw new RuntimeException("provide account type");
     }
-    if (transaction.getTransferFee() == null) {
-      transaction.setTransferFee(BigDecimal.ZERO);
+    if (transaction.getServiceFee() == null) {
+      transaction.setServiceFee(BigDecimal.ZERO);
     }
-    if (transaction.getTransferFee().compareTo(BigDecimal.ZERO) < 0) {
-      throw new IllegalArgumentException("Transfer fee can't be negative");
+    if (transaction.getServiceFee().compareTo(BigDecimal.ZERO) < 0) {
+      throw new IllegalArgumentException("Service fee can't be negative");
     }
     if (transaction.getType() == TransactionType.TRANSFER) {
 
@@ -140,7 +140,7 @@ public class TransactionService {
         .reduce(BigDecimal.ZERO, BigDecimal::add);
 
     BigDecimal expenseFromFees = transactions.stream()
-        .map(t -> t.getTransferFee() == null ? BigDecimal.ZERO : t.getTransferFee())
+        .map(t -> t.getServiceFee() == null ? BigDecimal.ZERO : t.getServiceFee())
         .reduce(BigDecimal.ZERO, BigDecimal::add);
 
     BigDecimal balance = totalIncome.subtract(expenseFromFees).subtract(totalExpense);

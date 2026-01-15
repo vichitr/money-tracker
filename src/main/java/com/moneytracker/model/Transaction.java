@@ -53,7 +53,7 @@ public class Transaction {
     private LocalDateTime updatedAt;
 
     @Column(name = "fee", nullable = false)
-    private BigDecimal transferFee = BigDecimal.ZERO;
+    private BigDecimal serviceFee = BigDecimal.ZERO;
 
     public Transaction() {}
     
@@ -144,9 +144,9 @@ public class Transaction {
         this.accountType = accountType;
     }
 
-    public BigDecimal getTransferFee(){return transferFee;}
+    public BigDecimal getServiceFee(){return serviceFee;}
 
-    public void setTransferFee(BigDecimal transferFee){this.transferFee = transferFee;}
+    public void setServiceFee(BigDecimal serviceFee){this.serviceFee = serviceFee;}
 
     public LocalDate getDate(){
         return date;
