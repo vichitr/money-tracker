@@ -1,12 +1,15 @@
 package com.moneytracker.service;
 
+import com.moneytracker.dao.PaginationValidator;
+import com.moneytracker.dao.TransactionDAO;
 import com.moneytracker.model.Category;
-import com.moneytracker.model.ListTransactionRequest;
-import com.moneytracker.model.ListTransactionResponse;
+import com.moneytracker.model.PaginationRequest;
+import com.moneytracker.model.PaginationResponse;
 import com.moneytracker.model.Transaction;
 import com.moneytracker.model.TransactionSummary;
 import com.moneytracker.model.TransactionType;
 import com.moneytracker.repository.TransactionRepository;
+import jakarta.validation.Valid;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -19,20 +22,41 @@ import org.springframework.transaction.annotation.Transactional;
 public class TransactionService {
 
   private final TransactionRepository transactionRepository;
+  private final TransactionDAO transactionDAO;
 
-  public TransactionService(TransactionRepository transactionRepository) {
+  public TransactionService(TransactionRepository transactionRepository,
+      TransactionDAO transactionDAO) {
     this.transactionRepository = transactionRepository;
+    this.transactionDAO = transactionDAO;
   }
 
   @Transactional(readOnly = true)
   public List<Transaction> getAllTransactions() {
-    return transactionRepository.findAll();
+    String sql = "SELECT * FROM transactions ORDER BY date DESC";
+    return transactionDAO.executeQuery(sql);
   }
 
-  public ListTransactionResponse listTransactions(ListTransactionRequest request) {
-    return new ListTransactionResponse(transactionRepository.findAll());
-  }
+  @Transactional(readOnly = true)
+  public PaginationRequest paginationRequest(PaginationRequest request) {
+    // Validate pagination parameters
+    if (request.getOffset() == null || request.getOffset() < 0) {
+      throw new IllegalArgumentException("Offset must be >= 0");
+    }
+    if (request.getLimit() == null || request.getLimit() <= 0 || request.getLimit() > 100) {
+      throw new IllegalArgumentException("Limit must be > 0 and <= 100");
+    }
 
+    PaginationValidator.validate(request.getLimit(), request.getOffset());
+    // Get total count
+    Long totalCount = transactionDAO.getTransactionCount();
+
+    // Get paginated transactions using SQL OFFSET and LIMIT
+    String sql = "SELECT * FROM transactions ORDER BY date DESC LIMIT ? OFFSET ?";
+    List<Transaction> transactions = transactionDAO.executeQuery(sql, request.getLimit(),
+        request.getOffset());
+
+    return new PaginationRequest(totalCount, request.getOffset(), request.getLimit());
+  }
 
   @Transactional(readOnly = true)
   public Optional<Transaction> getTransactionById(long id) {
@@ -51,18 +75,35 @@ public class TransactionService {
     if (transaction.getType() == null) {
       throw new RuntimeException("Trxn Type can't be null");
     }
-    if(transaction.getCategory() == null) {
+    if (transaction.getCategory() == null) {
       throw new RuntimeException("Category can't be empty");
     }
-    if(transaction.getAccountType() == null){
+    if (transaction.getAccountType() == null) {
       throw new RuntimeException("provide account type");
     }
-    if(transaction.getDate() == null || transaction.getDate().isAfter(LocalDate.now())){
-      throw new RuntimeException("Date can't be empty or in future");
+    if (transaction.getTransferFee() == null) {
+      transaction.setTransferFee(BigDecimal.ZERO);
+    }
+    if (transaction.getTransferFee().compareTo(BigDecimal.ZERO) < 0) {
+      throw new IllegalArgumentException("Transfer fee can't be negative");
+    }
+    if (transaction.getType() == TransactionType.TRANSFER) {
+
+      if (transaction.getCategory() != Category.BANK_TRANSFER &&
+          transaction.getCategory() != Category.WALLET_TRANSFER) {
+
+        throw new IllegalArgumentException(
+            "TRANSFER transactions must use BANK_TRANSFER or WALLET_TRANSFER category"
+        );
+      }
     }
 
+    if (transaction.getDate() == null || transaction.getDate().isAfter(LocalDate.now())) {
+      throw new RuntimeException("Date can't be empty or in future");
+    }
     return transactionRepository.save(transaction);
   }
+
   public Optional<Transaction> updateTransaction(Long id, Transaction updatedTransaction) {
     Optional<Transaction> existingTransaction = transactionRepository.findById(id);
 
@@ -89,18 +130,20 @@ public class TransactionService {
   @Transactional(readOnly = true)
   public TransactionSummary getTransactionSummary() {
     List<Transaction> transactions = transactionRepository.findAll();
-    
+
     BigDecimal totalIncome = transactions.stream()
-        .filter(t -> t.getType() == TransactionType.INCOME)
-        .map(Transaction::getAmount)
+        .filter(t -> t.getType() == TransactionType.INCOME).map(Transaction::getAmount)
         .reduce(BigDecimal.ZERO, BigDecimal::add);
 
     BigDecimal totalExpense = transactions.stream()
-        .filter(t -> t.getType() == TransactionType.EXPENSE)
-        .map(Transaction::getAmount)
+        .filter(t -> t.getType() == TransactionType.EXPENSE).map(Transaction::getAmount)
         .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-    BigDecimal balance = totalIncome.subtract(totalExpense);
+    BigDecimal expenseFromFees = transactions.stream()
+        .map(t -> t.getTransferFee() == null ? BigDecimal.ZERO : t.getTransferFee())
+        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+    BigDecimal balance = totalIncome.subtract(expenseFromFees).subtract(totalExpense);
 
     return new TransactionSummary(totalIncome, totalExpense, balance, transactions.size());
   }
@@ -113,5 +156,25 @@ public class TransactionService {
   @Transactional(readOnly = true)
   public List<Transaction> getTransactionsByCategory(Category category) {
     return transactionRepository.findByCategory(category);
+  }
+
+  @Transactional(readOnly = true)
+  public PaginationResponse listTransactions(@Valid PaginationRequest request) {
+    // Validate pagination parameters
+    PaginationValidator.validate(request.getOffset(), request.getLimit());
+
+    // Get total count
+    Long totalCount = transactionDAO.getTransactionCount();
+
+    // Build SQL query string
+    String sql = "SELECT * FROM transactions ORDER BY date DESC LIMIT ? OFFSET ?";
+
+    // Execute query with actual arguments
+    List<Transaction> transactions = transactionDAO.executeQuery(sql, request.getLimit(),
+        request.getOffset());
+
+    // Create and return PaginationResponse
+    return new PaginationResponse(transactions, totalCount, request.getOffset(),
+        request.getLimit());
   }
 }

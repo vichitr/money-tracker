@@ -52,6 +52,9 @@ public class Transaction {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(name = "fee", nullable = false)
+    private BigDecimal transferFee = BigDecimal.ZERO;
+
     public Transaction() {}
     
     @PrePersist
@@ -136,9 +139,14 @@ public class Transaction {
     public AccountType getAccountType() {
         return accountType;
     }
+
     public void setAccountType(AccountType accountType){
         this.accountType = accountType;
     }
+
+    public BigDecimal getTransferFee(){return transferFee;}
+
+    public void setTransferFee(BigDecimal transferFee){this.transferFee = transferFee;}
 
     public LocalDate getDate(){
         return date;
