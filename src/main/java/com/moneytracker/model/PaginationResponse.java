@@ -2,17 +2,16 @@ package com.moneytracker.model;
 
 import java.util.List;
 
-public class ListTransactionResponse {
-
+public class PaginationResponse {
   private List<Transaction> transactionList;
   private Long totalCount;
   private Integer offset;
   private Integer limit;
 
-  public ListTransactionResponse() {
+  public PaginationResponse() {
   }
 
-  public ListTransactionResponse(List<Transaction> transactionList, Long totalCount, Integer offset, Integer limit) {
+  public PaginationResponse(List<Transaction> transactionList, Long totalCount, Integer offset, Integer limit) {
     this.transactionList = transactionList;
     this.totalCount = totalCount;
     this.offset = offset;
