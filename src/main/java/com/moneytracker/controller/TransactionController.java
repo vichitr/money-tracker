@@ -1,8 +1,11 @@
 package com.moneytracker.controller;
 
+import com.moneytracker.dao.PaginationValidator;
 import com.moneytracker.model.Category;
 import com.moneytracker.model.ListTransactionRequest;
 import com.moneytracker.model.ListTransactionResponse;
+import com.moneytracker.model.PaginationRequest;
+import com.moneytracker.model.PaginationResponse;
 import com.moneytracker.model.Transaction;
 import com.moneytracker.model.TransactionSummary;
 import com.moneytracker.model.TransactionType;
@@ -36,9 +39,9 @@ public class TransactionController {
   }
 
   @PostMapping("/list")
-  public ResponseEntity<ListTransactionResponse> listTransactions (
-      @RequestBody ListTransactionRequest request) {
-    ListTransactionResponse response = transactionService.listTransactions(request);
+  public ResponseEntity<PaginationResponse> listTransactions (
+      @Valid @RequestBody PaginationRequest request) {
+    PaginationResponse response = transactionService.listTransactions(request);
     return ResponseEntity.ok(response);
   }
 

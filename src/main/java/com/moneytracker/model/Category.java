@@ -26,7 +26,11 @@ public enum Category {
 
     TRAVEL("Travel"),
     RENT("Rent & Housing"),
-    OTHER_EXPENSE("Other Expense");
+    OTHER_EXPENSE("Other Expense"),
+
+    // transfer
+    BANK_TRANSFER("Bank Tranfer"),
+    WALLET_TRANSFER("Wallet transfer");
     
     private final String displayName;
     

@@ -2,7 +2,8 @@ package com.moneytracker.model;
 
 public enum TransactionType {
     INCOME("Income"),
-    EXPENSE("Expense");
+    EXPENSE("Expense"),
+    TRANSFER("Transfer");
     
     private final String displayName;
 
